@@ -1,0 +1,68 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "Reality Composer Pro Version 2.0 (448.120.2)"
+    }
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "Root"
+{
+    def Material "TextureCoordinatesColorMaterial"
+    {
+        token outputs:mtlx:surface.connect = </Root/TextureCoordinatesColorMaterial/UnlitSurface.outputs:out>
+        token outputs:realitykit:vertex
+        float2 ui:nodegraph:node:pos = (20, 20)
+        int ui:nodegraph:node:stackingOrder = 1
+        float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (345.03906, 99.85156)
+        int ui:nodegraph:realitykit:subgraphOutputs:stackingOrder = 87
+
+        def Shader "UnlitSurface"
+        {
+            uniform token info:id = "ND_realitykit_unlit_surfaceshader"
+            bool inputs:applyPostProcessToneMap
+            color3f inputs:color.connect = </Root/TextureCoordinatesColorMaterial/Combine3.outputs:out>
+            bool inputs:hasPremultipliedAlpha
+            float inputs:opacity.connect = </Root/TextureCoordinatesColorMaterial/Separate4.outputs:outw>
+            float inputs:opacityThreshold
+            token outputs:out
+            float2 ui:nodegraph:node:pos = (118.69141, 45.58203)
+            int ui:nodegraph:node:stackingOrder = 98
+        }
+
+        def Shader "TextureCoordinates"
+        {
+            uniform token info:id = "ND_texcoord_vector4"
+            int inputs:index = 2
+            float4 outputs:out
+            float2 ui:nodegraph:node:pos = (-462.42188, 29.40625)
+            int ui:nodegraph:node:stackingOrder = 93
+        }
+
+        def Shader "Separate4"
+        {
+            uniform token info:id = "ND_separate4_vector4"
+            float4 inputs:in.connect = </Root/TextureCoordinatesColorMaterial/TextureCoordinates.outputs:out>
+            float outputs:outw
+            float outputs:outx
+            float outputs:outy
+            float outputs:outz
+            float2 ui:nodegraph:node:pos = (-258.1289, 29.328125)
+            int ui:nodegraph:node:stackingOrder = 91
+        }
+
+        def Shader "Combine3"
+        {
+            uniform token info:id = "ND_combine3_color3"
+            float inputs:in1.connect = </Root/TextureCoordinatesColorMaterial/Separate4.outputs:outx>
+            float inputs:in2.connect = </Root/TextureCoordinatesColorMaterial/Separate4.outputs:outy>
+            float inputs:in3.connect = </Root/TextureCoordinatesColorMaterial/Separate4.outputs:outz>
+            color3f outputs:out
+            float2 ui:nodegraph:node:pos = (-80.16016, 3.4726562)
+            int ui:nodegraph:node:stackingOrder = 89
+        }
+    }
+}
+
