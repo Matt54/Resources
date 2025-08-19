@@ -1,0 +1,246 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "Reality Composer Pro Version 2.0 (448.120.2)"
+    }
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "Root"
+{
+    reorder nameChildren = ["Sphere", "Capsule", "Cube", "GlassMaterial"]
+    def Sphere "Sphere" (
+        active = true
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        rel material:binding = </Root/GlassMaterial> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        double radius = 0.1
+
+        def Material "DefaultMaterial"
+        {
+            prepend token outputs:surface.connect = </Root/Sphere/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+            def Shader "DefaultSurfaceShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (1, 1, 1)
+                float inputs:roughness = 0.75
+                token outputs:surface
+            }
+        }
+    }
+
+    def Capsule "Capsule" (
+        active = true
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        uniform token axis = "Y"
+        double height = 0.2
+        rel material:binding = </Root/GlassMaterial> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        double radius = 0.1
+        float3 xformOp:translate = (-0.3, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Material "DefaultMaterial"
+        {
+            prepend token outputs:surface.connect = </Root/Capsule/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+            def Shader "DefaultSurfaceShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (1, 1, 1)
+                float inputs:roughness = 0.75
+                token outputs:surface
+            }
+        }
+    }
+
+    def Cube "Cube" (
+        active = true
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        rel material:binding = </Root/GlassMaterial> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        double size = 0.2
+        float3 xformOp:translate = (0.3, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Material "DefaultMaterial"
+        {
+            prepend token outputs:surface.connect = </Root/Cube/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+            def Shader "DefaultSurfaceShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (1, 1, 1)
+                float inputs:roughness = 0.75
+                token outputs:surface
+            }
+        }
+    }
+
+    def Material "GlassMaterial"
+    {
+        float inputs:eta = 0.5 (
+            customData = {
+                dictionary realitykit = {
+                    float2 positionInSubgraph = (-1283.9524, 86.42302)
+                    int stackingOrderInSubgraph = 47
+                }
+            }
+        )
+        float inputs:materialRoughness = 0 (
+            customData = {
+                dictionary realitykit = {
+                    float2 positionInSubgraph = (-294.26172, -251.76953)
+                }
+            }
+        )
+        float inputs:radianceRoughness = 0 (
+            customData = {
+                dictionary realitykit = {
+                    float2 positionInSubgraph = (-853.4219, -177.29688)
+                    int stackingOrderInSubgraph = 114
+                }
+            }
+        )
+        float inputs:specular = 0 (
+            customData = {
+                dictionary realitykit = {
+                    float2 positionInSubgraph = (-299.54688, -135.80496)
+                    int stackingOrderInSubgraph = 115
+                }
+            }
+        )
+        token outputs:mtlx:surface.connect = </Root/GlassMaterial/PBRSurface.outputs:out>
+        token outputs:realitykit:vertex
+        float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (472.26196, -40.255966)
+        int ui:nodegraph:realitykit:subgraphOutputs:stackingOrder = 71
+
+        def Shader "EnvironmentRadiance"
+        {
+            uniform token info:id = "ND_realitykit_environment_radiance"
+            color3f inputs:baseColor = (1, 1, 1) (
+                colorSpace = "lin_srgb"
+            )
+            half inputs:metallic = 1
+            float3 inputs:normal.connect = </Root/GlassMaterial/Normalize.outputs:out>
+            half inputs:roughness.connect = </Root/GlassMaterial/Convert.outputs:out>
+            half inputs:specular
+            color3f outputs:diffuseRadiance
+            color3f outputs:specularRadiance
+            float2 ui:nodegraph:node:pos = (-330.98047, 34.9375)
+            int ui:nodegraph:node:stackingOrder = 87
+            string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["inputs:baseColor"]
+        }
+
+        def Shader "Add"
+        {
+            uniform token info:id = "ND_add_color3"
+            color3f inputs:in1.connect = </Root/GlassMaterial/EnvironmentRadiance.outputs:diffuseRadiance>
+            color3f inputs:in2.connect = </Root/GlassMaterial/EnvironmentRadiance.outputs:specularRadiance>
+            color3f outputs:out
+            float2 ui:nodegraph:node:pos = (-109.83984, 87.390625)
+            int ui:nodegraph:node:stackingOrder = 7
+        }
+
+        def Shader "Normal"
+        {
+            uniform token info:id = "ND_normal_vector3"
+            float3 outputs:out
+            float2 ui:nodegraph:node:pos = (-1289.4974, 1.2323818)
+            int ui:nodegraph:node:stackingOrder = 46
+        }
+
+        def Shader "Refract"
+        {
+            uniform token info:id = "ND_realitykit_refract_vector3"
+            float inputs:eta.connect = </Root/GlassMaterial.inputs:eta>
+            float3 inputs:in.connect = </Root/GlassMaterial/ViewDirection.outputs:out>
+            float3 inputs:normal.connect = </Root/GlassMaterial/Normal.outputs:out>
+            float3 outputs:out
+            float2 ui:nodegraph:node:pos = (-890.10406, 41.850685)
+            int ui:nodegraph:node:stackingOrder = 36
+        }
+
+        def Shader "Normalize"
+        {
+            uniform token info:id = "ND_normalize_vector3"
+            float3 inputs:in.connect = </Root/GlassMaterial/Add_1.outputs:out>
+            float3 outputs:out
+            float2 ui:nodegraph:node:pos = (-539.4218, 83.66502)
+            int ui:nodegraph:node:stackingOrder = 62
+        }
+
+        def Shader "ViewDirection"
+        {
+            uniform token info:id = "ND_realitykit_viewdirection_vector3"
+            float3 outputs:out
+            float2 ui:nodegraph:node:pos = (-1291.8213, 258.88293)
+            int ui:nodegraph:node:stackingOrder = 49
+        }
+
+        def Shader "Convert"
+        {
+            uniform token info:id = "ND_convert_float_half"
+            float inputs:in.connect = </Root/GlassMaterial.inputs:radianceRoughness>
+            half outputs:out
+            float2 ui:nodegraph:node:pos = (-675.35547, -133.45312)
+            int ui:nodegraph:node:stackingOrder = 35
+        }
+
+        def Shader "Multiply"
+        {
+            uniform token info:id = "ND_multiply_vector3FA"
+            prepend float3 inputs:in1.connect = </Root/GlassMaterial/ViewDirection.outputs:out>
+            float inputs:in2 = -1
+            float3 outputs:out
+            float2 ui:nodegraph:node:pos = (-1015.09375, 283.64844)
+            int ui:nodegraph:node:stackingOrder = 57
+        }
+
+        def Shader "Add_1"
+        {
+            uniform token info:id = "ND_add_vector3"
+            float3 inputs:in1.connect = </Root/GlassMaterial/Multiply.outputs:out>
+            float3 inputs:in2.connect = </Root/GlassMaterial/Refract.outputs:out>
+            float3 outputs:out
+            float2 ui:nodegraph:node:pos = (-670.08984, 156.00781)
+            int ui:nodegraph:node:stackingOrder = 60
+        }
+
+        def Shader "PBRSurface"
+        {
+            uniform token info:id = "ND_realitykit_pbr_surfaceshader"
+            float inputs:ambientOcclusion
+            color3f inputs:baseColor
+            float inputs:clearcoat = 0
+            float3 inputs:clearcoatNormal
+            float inputs:clearcoatRoughness
+            color3f inputs:emissiveColor.connect = </Root/GlassMaterial/Add.outputs:out>
+            bool inputs:hasPremultipliedAlpha
+            float inputs:metallic
+            float3 inputs:normal
+            float inputs:opacity
+            float inputs:opacityThreshold
+            float inputs:roughness = 0.5
+            float inputs:roughness.connect = </Root/GlassMaterial.inputs:materialRoughness>
+            float inputs:specular = 0.14
+            float inputs:specular.connect = </Root/GlassMaterial.inputs:specular>
+            token outputs:out
+            float2 ui:nodegraph:node:pos = (109.382545, -154.492)
+            int ui:nodegraph:node:stackingOrder = 112
+        }
+    }
+}
+
