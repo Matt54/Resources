@@ -1,0 +1,72 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "Reality Composer Pro Version 2.0 (448.120.2)"
+    }
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "Root"
+{
+    def Material "GeometryColorPBRMaterial"
+    {
+        float inputs:metallic = 0 (
+            customData = {
+                dictionary realitykit = {
+                    float2 positionInSubgraph = (-282.08203, 29.234375)
+                    int stackingOrderInSubgraph = 10
+                }
+            }
+        )
+        float inputs:roughness = 0.5 (
+            customData = {
+                dictionary realitykit = {
+                    float2 positionInSubgraph = (-270.48438, -38.027344)
+                    int stackingOrderInSubgraph = 15
+                }
+            }
+        )
+        float inputs:specular = 0.5 (
+            customData = {
+                dictionary realitykit = {
+                    float2 positionInSubgraph = (-282.84375, 92.50391)
+                    int stackingOrderInSubgraph = 9
+                }
+            }
+        )
+        token outputs:mtlx:surface.connect = </Root/GeometryColorPBRMaterial/PBRSurface.outputs:out>
+        token outputs:realitykit:vertex
+        float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (335.5, 100.5)
+
+        def Shader "PBRSurface"
+        {
+            uniform token info:id = "ND_realitykit_pbr_surfaceshader"
+            float inputs:ambientOcclusion
+            color3f inputs:baseColor.connect = </Root/GeometryColorPBRMaterial/GeometryColor.outputs:out>
+            float inputs:clearcoat
+            float inputs:clearcoatRoughness
+            color3f inputs:emissiveColor
+            bool inputs:hasPremultipliedAlpha
+            float inputs:metallic.connect = </Root/GeometryColorPBRMaterial.inputs:metallic>
+            float3 inputs:normal
+            float inputs:opacity
+            float inputs:opacityThreshold
+            float inputs:roughness.connect = </Root/GeometryColorPBRMaterial.inputs:roughness>
+            float inputs:specular.connect = </Root/GeometryColorPBRMaterial.inputs:specular>
+            token outputs:out
+            float2 ui:nodegraph:node:pos = (52.48047, -11.496094)
+            int ui:nodegraph:node:stackingOrder = 5
+        }
+
+        def Shader "GeometryColor"
+        {
+            uniform token info:id = "ND_geomcolor_color3"
+            color3f outputs:out
+            float2 ui:nodegraph:node:pos = (-251.57585, -107.181984)
+            int ui:nodegraph:node:stackingOrder = 8
+        }
+    }
+}
+
